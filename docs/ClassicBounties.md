@@ -1,0 +1,10 @@
+# Functions
+
+issueBountyAndContribute
+issueBounty
+contribute
+refundContribution
+refundContributions
+performAction
+acceptFulfillment
+fulfillAndAccept
