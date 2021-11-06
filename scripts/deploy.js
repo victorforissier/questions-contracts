@@ -2,13 +2,12 @@ async function main() {
 	const [deployer] = await ethers.getSigners();
 
 	console.log("Deploying contracts with the account:", deployer.address);
-
 	console.log("Account balance:", (await deployer.getBalance()).toString());
 
-	const Token = await ethers.getContractFactory("Token");
-	const token = await Token.deploy();
+	const ClassicBounties = await ethers.getContractFactory("ClassicBounties");
+	const classicBounties = await ClassicBounties.deploy();
 
-	console.log("Token address:", token.address);
+	console.log("ClassicBounties address:", classicBounties.address);
 }
 
 main()
