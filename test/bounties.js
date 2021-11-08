@@ -1,28 +1,28 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Bounties functions", function () {
+describe("Bounties functions", function() {
 	let owner;
 	let contributor;
 	let answerer;
 	let bounties;
 
-	beforeEach(async function () {
+	beforeEach(async function() {
 		// Get the ContractFactory and Signers here.
 		const Bounties = await ethers.getContractFactory("ClassicBounties");
 		[owner, contributor, answerer] = await ethers.getSigners();
 		bounties = await Bounties.deploy();
 	});
 
-	describe("#contribute", function () {
-		beforeEach(async function () {
+	describe("#contribute", function() {
+		beforeEach(async function() {
 			await bounties
 				.connect(contributor)
 				.issueBounty(contributor.address, "questionId", 0);
 			expect(await bounties.numBounties()).to.equal(1);
 		});
 
-		it("Should contribute to bounty", async function () {
+		it("Should contribute to bounty", async function() {
 			const _amount = ethers.utils.parseEther("1");
 			await bounties
 				.connect(contributor)
@@ -35,9 +35,9 @@ describe("Bounties functions", function () {
 		});
 	});
 
-	describe("#issueAndContribute", function () {
-		it("Should create bounty", async function () {
-			const _amount = ethers.utils.parseEther("1");
+	describe("#issueAndContribute", function() {
+		it("Should create bounty", async function() {
+			const _amount = ethers.utils.parseEther((1 / 10000).toString());
 			await bounties
 				.connect(contributor)
 				.issueBountyAndContribute(
