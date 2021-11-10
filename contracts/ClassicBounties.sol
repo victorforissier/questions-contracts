@@ -6,45 +6,37 @@ import "hardhat/console.sol";
 contract ClassicBounties {
   using SafeMath for uint256;
 
-  /* #structs */
+  // STRUCTS
   struct Bounty {
     address payable issuer; 
-    // Individuals who submitted the bounty question
     uint deadline; 
-    // The Unix timestamp before which all submissions must be made, and after which refunds may be processed
     uint balance; 
-    // The number of tokens which the bounty is able to pay out or refund
-    bool hasBeenAnswered; 
-    // A boolean storing whether or not the bounty has paid out at least once, meaning refunds are no longer allowed
+    bool hasBeenAnswered;
+    string questionId; 
     Fulfillment[] fulfillments; 
-    // An array of Fulfillments which store the various submissions which have been made to the bounty
     Contribution[] contributions; 
-    // An array of Contributions which store the contributions which have been made to the bounty
   }
 
   struct Fulfillment {
-    string answerId; // An array of addresses who should receive payouts for a given submission
-    address payable submitter; // The address of the individual who submitted the fulfillment, who is able to update the submission as needed
-    uint timestamp; // The Unix timestamp at which the submission was made
+    string answerId;
+    address payable submitter;
+    uint timestamp;
   }
 
   struct Contribution {
-    address payable contributor; // The address of the individual who contributed
-    uint amount; // The amount of tokens the user contributed
-    bool refunded; // A boolean storing whether or not the contribution has been refunded yet
+    address payable contributor; 
+    uint amount;
+    bool refunded;
   }
 
-  /* #storage */
+  // STORAGE
   uint public numBounties; // An integer storing the total number of bounties in the contract
   mapping(uint => Bounty) public bounties; // A mapping of bountyIDs to bounties
-  mapping (uint => mapping (uint => bool)) public tokenBalances; // A mapping of bountyIds to tokenIds to booleans, storing whether a given bounty has a given ERC721 token in its balance
 
-
-  address public owner; // The address of the individual who's allowed to set the metaTxRelayer address
-  
+  address public owner; 
   bool public callStarted; // Ensures mutex for the entire contract
 
-/* Modifiers */
+  // MODIFIERS
   modifier callNotStarted(){
     require(!callStarted);
     callStarted = true;
@@ -55,7 +47,7 @@ contract ClassicBounties {
   modifier validateBountyArrayIndex(
     uint _index)
   {
-    require(_index < numBounties);
+    require(_index < numBounties, "BountyArrayIndex out of bounds");
     _;
   }
 
@@ -78,16 +70,6 @@ contract ClassicBounties {
   modifier onlyIssuer(address _sender, uint _bountyId) 
   {
     require(_sender == bounties[_bountyId].issuer);
-    _;
-  }
-
-  modifier onlySubmitter(
-    address _sender,
-    uint _bountyId,
-    uint _fulfillmentId)
-  {
-    require(_sender ==
-            bounties[_bountyId].fulfillments[_fulfillmentId].submitter);
     _;
   }
 
@@ -117,7 +99,7 @@ contract ClassicBounties {
   modifier isOverDeadline(
     uint _bountyId)
   {
-    require(block.timestamp > bounties[_bountyId].deadline); // Refunds may only be processed after the deadline has elapsed
+    require(block.timestamp > bounties[_bountyId].deadline); 
     _;
   }
 
@@ -135,74 +117,67 @@ contract ClassicBounties {
     _;
   }
 
-  /* #public functions */
   constructor() {
     owner = msg.sender;
   }
 
-  // @dev issueBounty(): creates a new bounty
-  // @param _sender the sender of the transaction issuing the bounty (should be the same as msg.sender unless the txn is called by the meta tx relayer)
-  // @param _questionId questionID in the database
-  // @param _deadline the timestamp which will become the deadline of the bounty
-  // @param _depositAmount the amount of tokens being deposited to the bounty, which will create a new contribution to the bounty
+
+  // PUBLIC FUNCTIONS
+  /*
+    @dev issueBounty(): creates a new bounty and fund it
+    
+    @param _sender creator of the bounty
+    @param _questionId documentId in the projet database
+    @param _depositAmount the amount of tokens contributed to the bounty
+  */
   function issueBountyAndContribute(
       address payable _sender,
       string memory _questionId,
-      uint _deadline,
       uint _depositAmount
     )
     public
     payable     
     senderIsValid(_sender)
-    returns(uint)
   {
-    uint bountyId = issueBounty(_sender, _questionId, _deadline);
-
+    uint bountyId = issueBounty(_sender, _questionId);
     contribute(_sender, bountyId, _depositAmount);
-
-    return (bountyId);
   }
 
-  // TODO make public internal
+  /*
+    @dev issueBounty(): creates a new bounty
+    
+    @param _sender creator of the bounty
+    @param _questionId documentId in the projet database
+  */
+  // TODO make public internal: people should only post funded bounties
   function issueBounty(
     address payable _sender,
-    string memory _questionId,
-    uint _deadline)
+    string memory _questionId)
     public 
     returns (uint)
   {
-    uint bountyId = numBounties; // The next bounty's index will always equal the number of existing bounties
+    // The next bounty's index is the number of existing bounties
+    uint bountyId = numBounties;
+    
     Bounty storage newBounty = bounties[bountyId];
     newBounty.issuer = _sender;
-    newBounty.deadline = _deadline;
+    newBounty.deadline = block.timestamp + 86400 * 3;
+    newBounty.questionId = _questionId;
 
-    // Only if ERC20
-    // newBounty.token = _token;
+    // Increments the new total number of bounties
+    numBounties = numBounties.add(1);
 
-    numBounties = numBounties.add(1); // Increments the number of bounties, since a new one has just been added
-
-    emit BountyIssued(bountyId,
-                      _sender,
-                      _questionId, // Instead of storing the string on-chain, it is emitted within the event for easy off-chain consumption
-                      _deadline);
-
-    return (bountyId);
+    emit BountyIssued(bountyId, _sender, _questionId, block.timestamp + 86400 * 3);
+    return bountyId;
   }
 
-
-
-
-  // @dev contribute(): Allows users to contribute tokens to a given bounty.
-  //                    Contributing merits no privelages to administer the
-  //                    funds in the bounty or accept submissions. Contributions
-  //                    are refundable but only on the condition that the deadline
-  //                    has elapsed, and the bounty has not yet paid out any funds.
-  //                    All funds deposited in a bounty are at the mercy of a
-  //                    bounty's issuers and approvers, so please be careful!
-  // @param _sender the sender of the transaction issuing the bounty (should be the same as msg.sender
-  // @param _bountyId the index of the bounty
-  // @param _amount the amount of tokens being contributed
-  // TODO make public internal
+  /* 
+    @dev contribute(): Contribute tokens to a given bounty. 
+    
+    @param _sender who is contributing
+    @param _bountyId the index of the bounty
+    @param _amount the amount of tokens being contributed
+  */
   function contribute(
     address payable _sender,
     uint _bountyId,
@@ -224,12 +199,13 @@ contract ClassicBounties {
     emit ContributionAdded(_bountyId, contributionId, _sender, _amount);
   }
 
-  // @dev refundContribution(): Allows users to refund the contributions they've
-  //                            made to a particular bounty, but only if the bounty
-  //                            has not yet paid out, and the deadline has elapsed.
-  // @param _sender the sender of the transaction issuing the bounty (should be the same as msg.sender unless the txn is called by the meta tx relayer)
-  // @param _bountyId the index of the bounty
-  // @param _contributionId the index of the contribution being refunded
+  /*
+    @dev refundContribution(): Allow user to refund a contribution if the deadline is passed and there are no answers
+    
+    @param _sender contribution owner
+    @param _bountyId the index of the bounty
+    @param _contributionId the index of the contribution being refunded
+  */
   function refundContribution(
     address _sender,
     uint _bountyId,
@@ -248,67 +224,20 @@ contract ClassicBounties {
     Contribution storage contribution = bounties[_bountyId].contributions[_contributionId];
 
     contribution.refunded = true;
-
-    transferTokens(_bountyId, contribution.contributor, contribution.amount); // Performs the disbursal of tokens to the contributor
+    transferTokens(_bountyId, contribution.contributor, contribution.amount);
 
     emit ContributionRefunded(_bountyId, _contributionId);
   }
 
-  // @dev refundMyContributions(): Allows users to refund their contributions in bulk
-  // @param _sender the sender of the transaction issuing the bounty (should be the same as msg.sender unless the txn is called by the meta tx relayer)
-  // @param _bountyId the index of the bounty
-  // @param _contributionIds the array of indexes of the contributions being refunded
-  function refundMyContributions(
-    address _sender,
-    uint _bountyId,
-    uint[] memory _contributionIds)
-    public
-    senderIsValid(_sender)
-    isOverDeadline(_bountyId)
-  {
-    for (uint i = 0; i < _contributionIds.length; i++){
-        refundContribution(_sender, _bountyId, _contributionIds[i]);
-    }
-  }
-
-  // @dev refundContributions(): Allows users to refund their contributions in bulk
-  // @param _sender the sender of the transaction issuing the bounty (should be the same as msg.sender)
-  // @param _bountyId the index of the bounty
-  // @param _contributionIds the array of indexes of the contributions being refunded
-  function refundContributions(
-    address _sender,
-    uint _bountyId,
-    uint[] memory _contributionIds)
-    public
-    senderIsValid(_sender)
-    validateBountyArrayIndex(_bountyId)
-    onlyIssuer(_sender, _bountyId)
-    callNotStarted
-    hasNoAnswers(_bountyId)
-    isOverDeadline(_bountyId)
-  {
-    for (uint i = 0; i < _contributionIds.length; i++){
-      require(_contributionIds[i] < bounties[_bountyId].contributions.length);
-
-      Contribution storage contribution = bounties[_bountyId].contributions[_contributionIds[i]];
-
-      require(!contribution.refunded);
-
-      contribution.refunded = true;
-
-      transferTokens(_bountyId, contribution.contributor, contribution.amount); // Performs the disbursal of tokens to the contributor
-    }
-
-    emit ContributionsRefunded(_bountyId, _sender, _contributionIds);
-  }
-
-  // @dev fulfillBounty(): Allows users to fulfill the bounty to get paid out
-    // @param _sender the sender of the transaction issuing the bounty (should be the same as msg.sender)
-    // @param _bountyId the index of the bounty
-    // @param _fulfillers the array of addresses which will receive payouts for the submission
-    // @param _data the IPFS hash corresponding to a JSON object which contains the details of the submission (see docs for schema details)
+  /* 
+    @dev fulfillBounty(): Allows users to fulfill the bounty to get paid out
+    
+    @param _sender the fulfiller of the bounty
+    @param _bountyId the index of the bounty
+    @param _answerId the documentId of the answer in Narcissa DB
+  */
   function fulfillBounty(
-    address _sender,
+    address payable _sender,
     uint _bountyId,
     string memory _answerId)
     public
@@ -319,52 +248,55 @@ contract ClassicBounties {
     bounties[_bountyId].hasBeenAnswered = true;
     bounties[_bountyId].fulfillments.push(Fulfillment(_answerId, _sender, block.timestamp));
 
-    emit BountyFulfilled(_bountyId, _sender, _answerId, (bounties[_bountyId].fulfillments.length - 1), 
+    emit BountyFulfilled(_bountyId, _sender, _answerId, (bounties[_bountyId].fulfillments.length - 1));
   }
 
-  // @dev acceptFulfillment(): Allows any of the approvers to accept a given submission
-  // @param _sender the sender of the transaction issuing the bounty (should be the same as msg.sender)
-  // @param _bountyId the index of the bounty
-  // @param _fulfillmentId the index of the fulfillment to be accepted
-  // @param _tokenAmounts the array of token amounts which will be paid to the
-  //                      fulfillers, whose length should equal the length of the
-  //                      _fulfillers array of the submission. If the bounty pays
-  //                      in ERC721 tokens, then these should be the token IDs
-  //                      being sent to each of the individual fulfillers
-  function acceptFulfillment(
+  /*
+    @dev acceptAnswer(): Allows any of the approvers to accept a given submission
+    
+    @param _sender the sender of the transaction (approver)
+    @param _bountyId the index of the bounty
+    @param _answerId the index of the fulfillment to be accepted
+    @param _tokenAmount how much tokens to transfer to the fulfiller 
+  */
+  function acceptAnswer(
     address _sender,
     uint _bountyId,
-    uint _fulfillmentId,
-    uint[] memory _tokenAmounts)
+    uint _answerId,
+    uint _tokenAmount)
     public
     senderIsValid(_sender)
     validateBountyArrayIndex(_bountyId)
-    validateFulfillmentArrayIndex(_bountyId, _fulfillmentId)
+    validateFulfillmentArrayIndex(_bountyId, _answerId)
     isApprover(_sender, _bountyId)
     callNotStarted
   {
 
-    Fulfillment storage fulfillment = bounties[_bountyId].fulfillments[_fulfillmentId];
+    Fulfillment storage fulfillment = bounties[_bountyId].fulfillments[_answerId];
+    require(_tokenAmount > 0, "Token amount is inferior to 0.");
 
-    require(_tokenAmounts.length == fulfillment.fulfillers.length); // Each fulfiller should get paid some amount of tokens (this can be 0)
-
-    for (uint256 i = 0; i < fulfillment.fulfillers.length; i++){
-        if (_tokenAmounts[i] > 0){
-          // for each fulfiller associated with the submission
-          transferTokens(_bountyId, fulfillment.fulfillers[i], _tokenAmounts[i]);
-        }
-    }
-    emit FulfillmentAccepted(_bountyId, _fulfillmentId, _tokenAmounts);
+    transferTokens(_bountyId, fulfillment.submitter, _tokenAmount);
+    emit AnswerAccepted(_bountyId, _answerId, _tokenAmount);
   }
 
-  // @dev getBounty(): Returns the details of the bounty
-  // @param _bountyId the index of the bounty
-  // @return Returns a tuple for the bounty
+  /* 
+    @dev getBounty(): Returns the details of the bounty
+    
+    @param _bountyId the index of the bounty
+    @return Returns a tuple for the bounty
+  */
   function getBounty(uint _bountyId) external view returns (Bounty memory) 
   {
     return bounties[_bountyId];
   }
 
+  /* 
+    @dev transferTokens(): Returns the details of the bounty
+    
+    @param _bountyId the index of the bounty
+    @param _to the address to transfer the tokens to
+    @param _amount the amount of tokens to transfer
+  */
   function transferTokens(uint _bountyId, address payable _to, uint _amount)
     internal
   {
@@ -376,12 +308,10 @@ contract ClassicBounties {
       _to.transfer(_amount);
   }
 
-  /* #events  */
+  // EVENTS
   event BountyIssued(uint _bountyId, address payable _issuer, string _questionId, uint _deadline);
   event ContributionAdded(uint _bountyId, uint _contributionId, address payable _contributor, uint _amount);
   event ContributionRefunded(uint _bountyId, uint _contributionId);
-  event ContributionsRefunded(uint _bountyId, address _issuer, uint[] _contributionIds);
-  event BountyFulfilled(uint _bountyId, uint _sender, string _answerId, uint numFulfillments);
-  event FulfillmentAccepted(uint _bountyId, uint  _fulfillmentId, uint[] _tokenAmounts);
-  event LogMessage(string _message);
+  event BountyFulfilled(uint _bountyId, address payable _sender, string _answerId, uint numFulfillments);
+  event AnswerAccepted(uint _bountyId, uint  _fulfillmentId, uint _tokenAmount);
 }
