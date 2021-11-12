@@ -121,7 +121,6 @@ contract ClassicBounties {
     owner = msg.sender;
   }
 
-
   // PUBLIC FUNCTIONS
   /*
     @dev issueBounty(): creates a new bounty and fund it
@@ -149,11 +148,10 @@ contract ClassicBounties {
     @param _sender creator of the bounty
     @param _questionId documentId in the projet database
   */
-  // TODO make public internal: people should only post funded bounties
   function issueBounty(
     address payable _sender,
     string memory _questionId)
-    public 
+    internal 
     returns (uint)
   {
     // The next bounty's index is the number of existing bounties
@@ -230,13 +228,13 @@ contract ClassicBounties {
   }
 
   /* 
-    @dev fulfillBounty(): Allows users to fulfill the bounty to get paid out
+    @dev answerBounty(): Allows users to fulfill the bounty to get paid out
     
     @param _sender the fulfiller of the bounty
     @param _bountyId the index of the bounty
     @param _answerId the documentId of the answer in Narcissa DB
   */
-  function fulfillBounty(
+  function answerBounty(
     address payable _sender,
     uint _bountyId,
     string memory _answerId)
@@ -275,7 +273,10 @@ contract ClassicBounties {
     Fulfillment storage fulfillment = bounties[_bountyId].fulfillments[_answerId];
     require(_tokenAmount > 0, "Token amount is inferior to 0.");
 
-    transferTokens(_bountyId, fulfillment.submitter, _tokenAmount);
+
+    uint protocolFee = uint((69 * _tokenAmount) / 1000);
+    transferTokens(_bountyId, payable(owner), protocolFee);
+    transferTokens(_bountyId, fulfillment.submitter, _tokenAmount - protocolFee);
     emit AnswerAccepted(_bountyId, _answerId, _tokenAmount);
   }
 
@@ -300,11 +301,9 @@ contract ClassicBounties {
   function transferTokens(uint _bountyId, address payable _to, uint _amount)
     internal
   {
-      require(_amount > 0); // Sending 0 tokens should throw
-      require(bounties[_bountyId].balance >= _amount);
-
+      require(_amount > 0, "Transaction amount inferior or equal to 0"); // Sending 0 tokens should throw
+      require(bounties[_bountyId].balance >= _amount, "Not enough money to transact.");
       bounties[_bountyId].balance = bounties[_bountyId].balance.sub(_amount);
-
       _to.transfer(_amount);
   }
 
