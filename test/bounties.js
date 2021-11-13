@@ -111,4 +111,27 @@ describe("Bounties functions", function() {
 			expect(nextBalance == prevBalance).to.be.false;
 		});
 	});
+
+	describe("#withdraw", function() {
+		const _amount = ethers.utils.parseEther("100");
+		beforeEach(async function() {
+			await bounties
+				.connect(contributor)
+				.issueBountyAndContribute(contributor.address, 0, _amount, {
+					value: _amount,
+				});
+		});
+		it("Should withdraw to owner", async function() {
+			const prevBalance = await ethers.provider.getBalance(owner.address);
+			expect(await bounties.connect(owner).getTotalSupply()).to.equal(
+				ethers.utils.parseEther("100")
+			);
+			await bounties.connect(owner).withdraw();
+			expect(await bounties.connect(owner).getTotalSupply()).to.equal(
+				ethers.utils.parseEther("0")
+			);
+			const nextBalance = await ethers.provider.getBalance(owner.address);
+			expect(prevBalance == nextBalance).to.be.false;
+		});
+	});
 });

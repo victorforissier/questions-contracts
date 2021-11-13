@@ -18,7 +18,7 @@ contract ClassicBounties {
   }
 
   struct Fulfillment {
-    string answerId;
+    string answerId; // Answer DocId
     address payable submitter;
     uint timestamp;
   }
@@ -70,6 +70,11 @@ contract ClassicBounties {
   modifier onlyIssuer(address _sender, uint _bountyId) 
   {
     require(_sender == bounties[_bountyId].issuer);
+    _;
+  }
+
+  modifier onlyOwner {
+    require(msg.sender == owner);
     _;
   }
 
@@ -236,7 +241,7 @@ contract ClassicBounties {
   */
   function answerBounty(
     address payable _sender,
-    uint _bountyId,
+    uint _bountyId, // really bounty index
     string memory _answerId)
     public
     senderIsValid(_sender)
@@ -245,8 +250,9 @@ contract ClassicBounties {
     // now that the bounty has been answered at least once, refunds are no longer possible
     bounties[_bountyId].hasBeenAnswered = true;
     bounties[_bountyId].fulfillments.push(Fulfillment(_answerId, _sender, block.timestamp));
+    uint answerIndex = bounties[_bountyId].fulfillments.length - 1;
 
-    emit BountyFulfilled(_bountyId, _sender, _answerId, (bounties[_bountyId].fulfillments.length - 1));
+    emit BountyFulfilled(_bountyId, _sender, _answerId, answerIndex);
   }
 
   /*
@@ -260,7 +266,7 @@ contract ClassicBounties {
   function acceptAnswer(
     address _sender,
     uint _bountyId,
-    uint _answerId,
+    uint _answerId, // Index in fullfilments
     uint _tokenAmount)
     public
     senderIsValid(_sender)
@@ -305,6 +311,26 @@ contract ClassicBounties {
       require(bounties[_bountyId].balance >= _amount, "Not enough money to transact.");
       bounties[_bountyId].balance = bounties[_bountyId].balance.sub(_amount);
       _to.transfer(_amount);
+  }
+
+  /* 
+    @dev withdraw(): In case s.o. hacked the contract, this function will be called to safekeep the tokens
+    
+    @param _bountyId the index of the bounty
+    @param _to the address to transfer the tokens to
+    @param _amount the amount of tokens to transfer
+  */
+  function withdraw()
+    external
+    onlyOwner
+  {
+    uint totalSupply = address(this).balance;
+    payable(owner).transfer(totalSupply);
+  }
+
+  function getTotalSupply() external view returns (uint)
+  {
+    return address(this).balance;
   }
 
   // EVENTS
