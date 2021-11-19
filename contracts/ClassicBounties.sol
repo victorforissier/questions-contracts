@@ -88,12 +88,6 @@ contract ClassicBounties {
     _;
   }
 
-  modifier isApprover(address _sender, uint _bountyId)
-  {
-    require(_sender == owner);
-    _;
-  }
-
   modifier hasNoAnswers(
     uint _bountyId)
   {
@@ -272,7 +266,7 @@ contract ClassicBounties {
     senderIsValid(_sender)
     validateBountyArrayIndex(_bountyId)
     validateFulfillmentArrayIndex(_bountyId, _answerId)
-    isApprover(_sender, _bountyId)
+    onlyOwner
     callNotStarted
   {
 
