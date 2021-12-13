@@ -1,15 +1,31 @@
-# Basic Sample Hardhat Project
+# Narcissa Hardhat Repository
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+Everything blockchain.
 
-Try running some of the following tasks:
+Organization:
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
 ```
+├── artifacts
+│   └── compiled solidity contracts
+├── contracts
+│   └── solidity contract source
+├── lib
+│   └── helper stuff
+├── scripts/
+│   └── useful scripts (deployment etc...)
+├── tasks/
+│   └── useful tasks
+└── test/
+    └── unit & integration tests for smart contracts
+```
+
+
+
+## Useful commands:
+Install hardhat ```yarn add hardhat```
+
+Run script in specific network: ```npx hardhat run scripts/deployNFT.js --network ropsten```
+
+hardhat help: ```npx hardhat help```
+
+compile scripts: ```npx hardhat compile```
