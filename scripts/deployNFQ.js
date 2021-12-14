@@ -11,11 +11,11 @@ async function main() {
     console.log("Account balance: " + ethers.utils.formatEther(await account.getBalance()));
 
     // Grab the contract factory 
-    const MyNFT = await ethers.getContractFactory("MyNFT");
+    const NarcissaNFQcontract = await ethers.getContractFactory("NarcissaNFQ");
  
     // Start deployment, returning a promise that resolves to a contract object
-    const myNFT = await MyNFT.deploy(); // Instance of the contract 
-    console.log("Contract deployed to address:", myNFT.address);
+    const NarcissaNFQ = await NarcissaNFQcontract.deploy(); // Instance of the contract 
+    console.log("Contract deployed to address:", NarcissaNFQ.address);
 
     let balance2 = await account.getBalance();
     console.log("Account balance: " + ethers.utils.formatEther(balance2));

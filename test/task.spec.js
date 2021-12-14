@@ -28,7 +28,7 @@ describe("tasks", () => {
 
   describe("mint-nft", () => {
     beforeEach(async () => {
-      const deployedContract = await deployTestContract("MyNFT");
+      const deployedContract = await deployTestContract("NarcissaNFQ");
       process.env.NFT_CONTRACT_ADDRESS = deployedContract.address;
     });
 

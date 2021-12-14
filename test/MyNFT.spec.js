@@ -6,7 +6,7 @@ import sinon from "sinon";
 import { deployTestContract } from "./test-helper";
 import * as provider from "../lib/provider";
 
-describe("MyNFT", () => {
+describe("NarcissaNFQ", () => {
   const TOKEN_URI = "http://example.com/ip_records/42";
   let deployedContract;
   let wallet;
@@ -14,7 +14,7 @@ describe("MyNFT", () => {
   beforeEach(async () => {
     sinon.stub(provider, "getProvider").returns(waffle.provider);
     [wallet] = waffle.provider.getWallets();
-    deployedContract = await deployTestContract("MyNFT");
+    deployedContract = await deployTestContract("NarcissaNFQ");
   });
 
   async function mintNftDefault() {

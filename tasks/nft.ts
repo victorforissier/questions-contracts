@@ -7,7 +7,7 @@ import { getWallet } from "../lib/wallet";
 
 task("deploy-contract", "Deploy NFT contract").setAction(async (_, hre) => {
   return hre.ethers
-    .getContractFactory("MyNFT", getWallet())
+    .getContractFactory("NarcissaNFQ", getWallet())
     .then((contractFactory) => contractFactory.deploy())
     .then((result) => {
       process.stdout.write(`Contract address: ${result.address}`);
@@ -17,7 +17,7 @@ task("deploy-contract", "Deploy NFT contract").setAction(async (_, hre) => {
 task("mint-nft", "Mint an NFT")
   .addParam("tokenUri", "Your ERC721 Token URI", undefined, types.string)
   .setAction(async (tokenUri, hre) => {
-    return getContract("MyNFT", hre)
+    return getContract("NarcissaNFQ", hre)
       .then((contract: Contract) => {
         return contract.mintNFT(env("ETH_PUBLIC_KEY"), tokenUri, {
           gasLimit: 500_000,

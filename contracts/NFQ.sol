@@ -10,14 +10,14 @@ import "../openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721URISto
 import "../openzeppelin-contracts/contracts/utils/Counters.sol";
 import "../openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract MyNFT is ERC721URIStorage {
+contract NarcissaNFQ is ERC721URIStorage {
     
     // increment for each minted token
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
     // standard ERC721 constructor
-    constructor() ERC721("MyNFT", "MNFT") {}
+    constructor() ERC721("NarcissaNFQ", "NFQ") {}
 
     // mint a singular NFT.
     function mintNFT(address recipient, string memory tokenURI)
