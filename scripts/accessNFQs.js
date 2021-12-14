@@ -14,7 +14,7 @@ async function getAllNFQs() {
     const abi = artifact.abi;
 
     // get all NFTs from contract
-    const n_tokens = 20;
+    const n_tokens = 10;
     var metadata = [];
     for (var i = 1; i < n_tokens; i++) {
         const token_id = i;
