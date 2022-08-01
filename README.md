@@ -32,7 +32,7 @@ compile scripts: ```npx hardhat compile```
 
 ## More Useful commands, added by Barb (2022-07-28)
 1.) Start a new npm project
-    npm init -y 
+    ```npm init -y```
 
 2.) Install hardhat
     npm install -D hardhat
