@@ -118,31 +118,12 @@ contract ClassicBounties {
 
   constructor() {
     owner = msg.sender;
-  }
-
-  // PUBLIC FUNCTIONS
-  /*
-    @dev issueBounty(): creates a new bounty and fund it
-    
-    @param _sender creator of the bounty
-    @param _questionId documentId in the projet database
-    @param _depositAmount the amount of tokens contributed to the bounty
-  */
-  function issueBountyAndContribute(
-      address payable _sender,
-      string memory _questionId,
-      uint _depositAmount
-    )
-    public
-    payable     
-    senderIsValid(_sender)
-  {
-    uint bountyId = issueBounty(_sender, _questionId);
-    contribute(_sender, bountyId, _depositAmount);
+    console.log("Owner: %s", owner);
   }
 
   /*
-    @dev issueBounty(): creates a new bounty
+    @dev issueBounty(): creates a new bounty, 
+                        called by issueBountyAndContribute
     
     @param _sender creator of the bounty
     @param _questionId documentId in the projet database
@@ -158,15 +139,44 @@ contract ClassicBounties {
     
     Bounty storage newBounty = bounties[bountyId];
     newBounty.issuer = _sender;
-    newBounty.deadline = block.timestamp + 86400 * 3;
+    newBounty.deadline = block.timestamp + 86400 * 3; // 3 days
     newBounty.questionId = _questionId;
+
+    console.log("issueBounty: Sender = %s, QuestionId= %s, Deadline= %s",
+                _sender, _questionId, newBounty.deadline);
 
     // Increments the new total number of bounties
     numBounties = numBounties.add(1);
+    console.log("NumBounties is: %s", numBounties);
 
     emit BountyIssued(bountyId, _sender, _questionId, block.timestamp + 86400 * 3);
     return bountyId;
   }
+
+  // PUBLIC FUNCTIONS
+  /*
+    @dev issueBountyAndContribute(): creates a new bounty and fund it
+    
+    @param _sender creator of the bounty
+    @param _questionId documentId in the projet database
+    @param _depositAmount the amount of tokens contributed to the bounty
+  */
+  function issueBountyAndContribute(
+      address payable _sender,
+      string memory _questionId,
+      uint _depositAmount
+    )
+    public
+    payable     
+    senderIsValid(_sender) 
+  {
+
+    /* Should check that _questionId does not already exist? */
+    uint bountyId = issueBounty(_sender, _questionId);
+    contribute(_sender, bountyId, _depositAmount);
+
+  }
+
 
   /* 
     @dev contribute(): Contribute tokens to a given bounty. 
@@ -181,23 +191,32 @@ contract ClassicBounties {
     uint _amount)
     public
     payable
-    senderIsValid(_sender)
+    senderIsValid(_sender) 
     validateBountyArrayIndex(_bountyId)
     callNotStarted
   {
 
-    require(_amount > 0, 'Amount inferior to 0.'); // Contributions of 0 tokens or token ID 0 should fail
-    require(msg.value == _amount, 'Amount not equal to msg.value.'); // Ensures that the amount being contributed is equal to the amount being sent
+    // Contributions of 0 tokens or token ID 0 should fail
+    require(_amount > 0, 'Amount inferior to 0.'); 
 
-    bounties[_bountyId].contributions.push(Contribution(_sender, _amount, false)); // Adds the contribution to the bounty
-    bounties[_bountyId].balance = bounties[_bountyId].balance.add(_amount); // Increments the balance of the bounty
+    // Ensures that the amount being contributed is equal to the amount being sent
+    require(msg.value == _amount, 'Amount not equal to msg.value.'); 
 
-    uint contributionId = bounties[_bountyId].contributions.length - 1; // The contribution's index will always equal the number of existing contributions
+    // Adds the contribution to the bounty
+    bounties[_bountyId].contributions.push(Contribution(_sender, _amount, false)); 
+
+    // Increments the balance of the bounty
+    bounties[_bountyId].balance = bounties[_bountyId].balance.add(_amount); 
+
+    // The contribution's index will always equal the number of existing contributions
+    uint contributionId = bounties[_bountyId].contributions.length - 1; 
+
     emit ContributionAdded(_bountyId, contributionId, _sender, _amount);
   }
 
   /*
-    @dev refundContribution(): Allow user to refund a contribution if the deadline is passed and there are no answers
+    @dev refundContribution(): Allow user to refund a contribution if 
+                               the deadline is passed and there are no answers
     
     @param _sender contribution owner
     @param _bountyId the index of the bounty
