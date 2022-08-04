@@ -30,6 +30,18 @@ describe("Bounties functions", function() {
 				.connect(contributor)
 				.refundContribution(contributor.address, "0",0);
 			expect(await bounties.numBounties()).to.equal(1);
+
+                        /* This transaction will not succeed as expected 
+                        // It shouldn't let me to do it again...
+			await bounties
+				.connect(contributor)
+				.refundContribution(contributor.address, "0",0);
+			expect(await bounties.numBounties()).to.equal(1);
+                        */
+
+
+
+
 		});
 	});
 
@@ -43,6 +55,9 @@ describe("Bounties functions", function() {
 					value: _amount,
 				});
 			expect(await bounties.numBounties()).to.equal(1);
+                        console.log("------ Print Bounty ------");
+                        console.log(await bounties.getBounty(0));
+                        console.log("------ Done ------");
 		});
 	});
 
