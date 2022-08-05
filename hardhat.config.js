@@ -8,11 +8,13 @@ require("dotenv").config({path : `/home/barb/.blockchainEnv`});
 
 module.exports = {
   solidity: {
-    compilers: [
-      { version: "0.8.0", },
-      { version: "0.8.4", },
-      { version: "0.6.7", }
-    ]
+    version: "0.8.2",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
   },
   networks: {
      ropsten: {
@@ -22,10 +24,11 @@ module.exports = {
      polygon: {
         url: process.env.POLYGON,
         accounts: [ process.env.BRAVE_METAMASK ]
-     }
-  },
-  namedAccounts: {
-      account0: 0
+     },
+     rinkeby: {
+        url: process.env.RINKEBY,
+        accounts: [ process.env.BRAVE_METAMASK ]
+     },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
