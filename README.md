@@ -20,19 +20,39 @@ Organization:
 ```
 
 
+## Getting Started (2022-08-05)
 
-## Useful commands:
+0.) Make sure you are using a relatively current verion of 
+    node.  I do ```nvm use 16.14.2```
+
+1.) Since there is a package-lock.json checked into the repo,
+    ```npm install```  should install all of the dependencies locally
+
+2.) Compile
+    ```npx hardhat compile```
+
+3.) Create a .env file with URLs to the various networks
+    and your private key
+
+4.) Edit hardhat.config.js to point to your env file
+
+5.) Test
+    ```npx hardhat test```
+
+6.) Deploy
+     ```npx hardhat run scripts/deploy.js --network ropsten``` 
+
+## Useful commands -- From the original README.  Left here 
+## for completeness
+
 Install hardhat ```yarn add hardhat```
-
-Run script in specific network: ```npx hardhat run scripts/deployNFT.js --network ropsten```
 
 hardhat help: ```npx hardhat help```
 
 compile scripts: ```npx hardhat compile```
 
-## More Useful commands, added by Barb (2022-07-28)
-
-0.) ```nvm use v16.14.2``` 
+## For more completeness, if you were starting with an
+## environment that didn't already have a package-lock.json... 
 
 1.) Start a new npm project
     ```npm init -y```
@@ -53,36 +73,29 @@ compile scripts: ```npx hardhat compile```
 6.) mkdir contracts
     cd contracts
     create solidity code
-
-7.) Compile
-    ```npx hardhat compile```
-
-8.) Artifacts from compiling will be in 
+7.) Artifacts from compiling will be in 
     ../artifacts/
 
-9.) Write tests in Javascript
+8.) Write tests in Javascript
     ```test/test.js```
 
-10.) Run the tests (from the root of the hardhat directory)
+9.) Run the tests (from the root of the hardhat directory)
      ```npx hardhat test```
 
-11.) Make a deploy script
+10.) Make a deploy script
      ```mkdir scripts```
      ```vi deploy.js```
 
-12.) Install dotenv
+11.) Install dotenv
      ```npm install dotenv```
 
-13.) Create a .env file with URLs to the various networks
-     and your private key
-
-14.) Run the deploy script targeted at the Ropsten test network
+12.) Run the deploy script targeted at the Ropsten test network
      ```npx hardhat run scripts/deploy.js --network ropsten``` 
 
-15.) ```npm install @nomiclabs/hardhat-etherscan``` 
+13.) ```npm install @nomiclabs/hardhat-etherscan``` 
 
-16.) Check ```https://ropsten.etherscan.io/address/<address>```
+14.) Check ```https://ropsten.etherscan.io/address/<address>```
 
-17.) Once the deploy shows up on etherscan, then run the hardhat verify:
+15.) Once the deploy shows up on etherscan, then run the hardhat verify:
     ```npx hardhat verify <address> --network ropsten```
 
