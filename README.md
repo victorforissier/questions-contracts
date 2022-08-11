@@ -28,18 +28,29 @@ Organization:
 1.) Since there is a package-lock.json checked into the repo,
     ```npm install```  should install all of the dependencies locally
 
-2.) Compile
+2.) Install this separately
+    ```npm install @nomiclabs/hardhat-etherscan``` 
+
+3.) Update hardhat.config.js with the path and filename
+    to your ENV file.  An example shell is in envExample.txt
+    NOTE:  You won't be able to compile until you have 
+    appropriate definitions in your .env file
+
+4.) Compile
     ```npx hardhat compile```
 
-3.) Create a .env file with URLs to the various networks
+5.) Create a .env file with URLs to the various networks
     and your private key
 
 4.) Edit hardhat.config.js to point to your env file
 
-5.) Test
+5.) Install some dependencies
+    ```npm install -D @nomiclabs/hardhat-ethers ethers @nomiclabs/hardhat-waffle ethereum-waffle chai```
+
+6.) Test
     ```npx hardhat test```
 
-6.) Deploy
+7.) Deploy
      ```npx hardhat run scripts/deploy.js --network ropsten``` 
 
 ## Useful commands -- From the original README.  Left here 
