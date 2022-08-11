@@ -16,6 +16,10 @@ describe("Bounties functions", function() {
                 console.log("Contributor Address: " , contributor.address);
 	});
 
+	/* To run this test, hardcode the timeout in the contract
+	 * to zero blocks and re-compile
+	 */
+	/* 
 	describe("#refundContribution", function() {
 		it("Should create bounty, then withdraw", async function() {
 			const _amount = ethers.utils.parseEther((1 / 10000).toString());
@@ -31,19 +35,11 @@ describe("Bounties functions", function() {
 				.refundContribution(contributor.address, "0",0);
 			expect(await bounties.numBounties()).to.equal(1);
 
-                        /* This transaction will not succeed as expected 
-                        // It shouldn't let me to do it again...
-			await bounties
-				.connect(contributor)
-				.refundContribution(contributor.address, "0",0);
-			expect(await bounties.numBounties()).to.equal(1);
-                        */
-
-
-
 
 		});
 	});
+
+        */
 
 
 	describe("#issueAndContribute", function() {
