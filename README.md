@@ -9,16 +9,11 @@ Organization:
 │   └── compiled solidity contracts
 ├── contracts
 │   └── solidity contract source
-├── lib
-│   └── helper stuff
 ├── scripts/
 │   └── useful scripts (deployment etc...)
-├── tasks/
-│   └── useful tasks
 └── test/
     └── unit & integration tests for smart contracts
 ```
-
 
 ## Getting Started (2022-08-05)
 
@@ -53,37 +48,38 @@ Organization:
 7.) Deploy
      ```npx hardhat run scripts/deploy.js --network ropsten``` 
 
-## Useful commands -- From the original README.  Left here 
-## for completeness
+## Useful commands -- From the original README. Left here for completeness.
 
 Install hardhat ```yarn add hardhat```
 
-hardhat help: ```npx hardhat help```
+Run script in specific network: `npx hardhat run scripts/deployNFT.js --network ropsten`
 
-compile scripts: ```npx hardhat compile```
+hardhat help: `npx hardhat help`
 
-## For more completeness, if you were starting with an
-## environment that didn't already have a package-lock.json... 
+compile scripts: `npx hardhat compile`
+
+## For more completeness, if you were starting with an environment that didn't already have a package-lock.json... 
 
 1.) Start a new npm project
-    ```npm init -y```
+`npm init -y`
 
 2.) Install hardhat
-    ```npm install -D hardhat```
+`npm install -D hardhat`
 
 3.) Create Hardhat project
-    ```npx hardhat```
+`npx hardhat`
 
     --> ``` Select 'create an empty hardhat.config.js ```
 
 4.) Install some dependencies
-    ```npm install -D @nomiclabs/hardhat-ethers ethers @nomiclabs/hardhat-waffle ethereum-waffle chai```
+`npm install -D @nomiclabs/hardhat-ethers ethers @nomiclabs/hardhat-waffle ethereum-waffle chai`
 
 5.) Edit hardhat.config.js to include dependencies
 
 6.) mkdir contracts
     cd contracts
     create solidity code
+    
 7.) Artifacts from compiling will be in 
     ../artifacts/
 
@@ -109,4 +105,3 @@ compile scripts: ```npx hardhat compile```
 
 15.) Once the deploy shows up on etherscan, then run the hardhat verify:
     ```npx hardhat verify <address> --network ropsten```
-

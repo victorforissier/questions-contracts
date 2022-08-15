@@ -1,5 +1,4 @@
 ROPSTEN
-
 Deploying contracts with the account: 0x6366797ec3631ff606b1469B39d0B7e9EAEE534b
 Account balance: 494627214827456873
 ClassicBounties address: 0xf474Dd07f1F19C13Bcfbc7b2151a1bF80C8c427a
