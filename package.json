@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "Smart contract for a simple implementation of question bounties",
 	"main": "index.js",
-	"author": "H&V",
+	"author": "Victor Forissier",
 	"license": "MIT",
 	"devDependencies": {
 		"@nomiclabs/hardhat-ethers": "^2.0.0",
