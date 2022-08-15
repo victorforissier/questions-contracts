@@ -10,19 +10,80 @@ describe("Bounties functions", function() {
 	beforeEach(async function() {
 		// Get the ContractFactory and Signers here.
 		const Bounties = await ethers.getContractFactory("ClassicBounties");
-		[owner, contributor, answerer] = await ethers.getSigners();
+		[owner, contributor, answerer, random] = await ethers.getSigners();
 		bounties = await Bounties.deploy();
+                console.log("Fresh Deploy of Contract to:", bounties.address);
+                console.log("Contributor Address: " , contributor.address);
 	});
 
-	describe("#contribute", function() {
-		beforeEach(async function() {
-			const _amount = ethers.utils.parseEther("1");
+	/* To run this test, hardcode the timeout in the contract
+	 * to zero blocks and re-compile
+	 */
+	/* 
+	describe("#refundContribution", function() {
+		it("Should create bounty, then withdraw", async function() {
+			const _amount = ethers.utils.parseEther((1 / 10000).toString());
 			await bounties
 				.connect(contributor)
-				.issueBountyAndContribute(contributor.address, "questionId", _amount, {
+				.issueBountyAndContribute(contributor.address, "Give me my Money Back!", _amount, {
 					value: _amount,
 				});
 			expect(await bounties.numBounties()).to.equal(1);
+
+			await bounties
+				.connect(contributor)
+				.refundContribution(contributor.address, "0",0);
+			expect(await bounties.numBounties()).to.equal(1);
+
+
+		});
+	});
+
+        */
+
+
+	describe("#issueAndContribute", function() {
+		it("Should create bounty", async function() {
+			const _amount = ethers.utils.parseEther((1 / 10000).toString());
+			await bounties
+				.connect(contributor)
+				.issueBountyAndContribute(contributor.address, "MyFirstQuestion", _amount, {
+					value: _amount,
+				});
+			expect(await bounties.numBounties()).to.equal(1);
+                        console.log("------ Print Bounty ------");
+                        console.log(await bounties.getBounty(0));
+                        console.log("------ Done ------");
+		});
+	});
+
+
+
+	describe("#contribute", function() {
+		beforeEach(async function() {
+			expect(await bounties.numBounties()).to.equal(0);
+			expect(await bounties.getTotalSupply()).to.equal(0);
+			const _amount = ethers.utils.parseEther("1");
+			await bounties
+				.connect(contributor)
+				.issueBountyAndContribute(contributor.address, "MySecondQuestion", _amount, {
+					value: _amount,
+				});
+			expect(await bounties.numBounties()).to.equal(1);
+			totalSupply1 = (await bounties.getTotalSupply());
+			console.log("FirstTotalSupply: %s:", totalSupply1);
+			await bounties
+				.connect(random)
+				.issueBountyAndContribute(random.address, "MyThirdQuestion", _amount, {
+					value: _amount,
+				});
+			expect(await bounties.numBounties()).to.equal(2);
+			totalSupply2 = (await bounties.getTotalSupply());
+			console.log("SecondTotalSupply: %s:", totalSupply2);
+                        increaseAmt = totalSupply2 - totalSupply1;
+			console.log("IncreaseAmount: %s ... %s" , increaseAmt, _amount);
+                        expect(increaseAmt - _amount).to.equal(0);
+
 		});
 
 		it("Should contribute to bounty", async function() {
@@ -33,20 +94,9 @@ describe("Bounties functions", function() {
 					value: _amount,
 				});
 			const bounty = await bounties.getBounty(0);
+
 			expect(bounty.contributions).to.have.lengthOf(2);
 			expect(bounty.contributions[1].amount).to.equal(_amount);
-		});
-	});
-
-	describe("#issueAndContribute", function() {
-		it("Should create bounty", async function() {
-			const _amount = ethers.utils.parseEther((1 / 10000).toString());
-			await bounties
-				.connect(contributor)
-				.issueBountyAndContribute(contributor.address, "questionId", _amount, {
-					value: _amount,
-				});
-			expect(await bounties.numBounties()).to.equal(1);
 		});
 	});
 

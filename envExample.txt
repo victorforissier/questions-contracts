@@ -1,0 +1,43 @@
+# This file shows a shell of an exmple .env file
+#
+# The variable names in this file match those expected
+# by the hardhat.config.js that is checked into the 
+# Summer2022-V1 branch
+#
+# Sign up for API keys and endpoints as necessary
+# Also export private key if necessary
+# Make sure you don't check this file into Git with 
+# populated values!!!!
+#
+# Pick and choose the items below that you need
+# Modify hardhat.config.js appropriately to 
+# use the items below OR delete stuff from 
+# hardhat.config.js that you don't need
+
+# Metamask private key
+BRAVE_METAMASK=
+
+# API Keys 
+ETHERSCAN_API_KEY=
+POLYGON_API_KEY=
+
+# Alchemy endpoing for Ropsten
+ROPSTEN=
+
+# Infura endpoint for Mainnet 
+ETH_MAINNET=
+
+# Alchemy endpoint for Polygon
+POLYGON=
+
+# Infura endpoint for Rinkeby
+RINKEBY=
+
+# Infura endpoint for ETH2 testnet
+ETH2=
+
+# Metamask public keys
+BRAVE_PUBLIC=
+CHROME_PUBLIC=
+
+DAI_CONTRACT_MAINNET=0x6B175474E89094C44Da98b954EedeAC495271d0F
