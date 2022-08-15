@@ -1,17 +1,17 @@
 {
-  "name": "NarcissaSC",
-  "version": "1.0.0",
-  "description": "Narcissa Smart Contracts and stuff",
-  "main": "index.js",
-  "author": "H&V",
-  "license": "MIT",
-  "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.0",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@openzeppelin/contracts": "^4.4.0",
-    "dotenv": "^10.0.0",
-    "ethereum-waffle": "^3.2.0",
-    "ethers": "^5.0.0",
-    "hardhat": "^2.7.1"
-  }
+	"name": "question-bounty-smart-contracts",
+	"version": "1.0.0",
+	"description": "Smart contract for a simple implementation of question bounties",
+	"main": "index.js",
+	"author": "H&V",
+	"license": "MIT",
+	"devDependencies": {
+		"@nomiclabs/hardhat-ethers": "^2.0.0",
+		"@nomiclabs/hardhat-waffle": "^2.0.1",
+		"@openzeppelin/contracts": "^4.4.0",
+		"dotenv": "^10.0.0",
+		"ethereum-waffle": "^3.2.0",
+		"ethers": "^5.0.0",
+		"hardhat": "^2.7.1"
+	}
 }
